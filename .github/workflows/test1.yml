@@ -84,7 +84,7 @@ jobs:
       with:
         path: |
           ~/cache_test3
-        key: cache3_test_${{ inputs.cache3_number }}
+        key: ${{ steps.cache3.outputs.cache-primary-key }}
     - name: check files
       run: |
         cat ~/cache_test1/file1
