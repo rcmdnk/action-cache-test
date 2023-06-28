@@ -17,6 +17,11 @@ on:
         type: string
         required: true
         default: 'this is file 2'
+      file3_content:
+        description: 'content of file3'
+        type: string
+        required: true
+        default: 'this is file 3'
 
 jobs:
   cache_test:
@@ -39,8 +44,25 @@ jobs:
           mkdir -p ~/cache_test1
           mkdir -p ~/cache_test2
           echo ${{ inputs.file1_content }} > ~/cache_test1/file1
-          echo ${{ inputs.file2_content }} > ~/cache_test2/file2
+          echo ${{ inputs.file1_content }} > ~/cache_test1/file2
+          echo ${{ inputs.file2_content }} > ~/cache_test2
+      - uses: actions/cache@v3
+        id: cache2
+        with:
+          path: |
+            ~/cache_test3
+          key: cache2_test_${{ inputs.cache_name }}
+          restore-keys: |
+            cache2_test_
+      - name: write file
+        if: steps.cache2.outputs.cache-hit != 'true'
+        run: |
+          echo make file
+          mkdir -p ~/cache_test3
+          echo ${{ inputs.file3_content }} > ~/cache_test3
       - name: check files
         run: |
           cat ~/cache_test1/file1
-          cat ~/cache_test2/file2
+          cat ~/cache_test1/file2
+          cat ~/cache_test2
+          cat ~/cache_test3
