@@ -30,6 +30,8 @@ jobs:
             ~/cache_test1
             ~/cache_test2
           key: cache_test_${{ inputs.cache_name }}
+          restore_keys: |
+            cache_test_
       - name: write file
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
