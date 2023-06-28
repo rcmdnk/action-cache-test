@@ -2,11 +2,21 @@ name: test1
 on:
   workflow_dispatch:
     inputs:
-      cache_name:
-        description: 'cache name'
+      cache1_number:
+        description: 'cache1 number'
         type: string
         required: true
-        default: 'cache1'
+        default: '1'
+      cache2_number:
+        description: 'cache2 number'
+        type: string
+        required: true
+        default: '1'
+      cache3_number:
+        description: 'cache3 number'
+        type: string
+        required: true
+        default: '1'
       file1_content:
         description: 'content of file1'
         type: string
@@ -28,39 +38,57 @@ jobs:
     name: cache_test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: |
-            ~/cache_test1
-            ~/cache_test2
-          key: cache_test_${{ inputs.cache_name }}
-          restore-keys: |
-            cache_test_
-      - name: write file
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          echo make file
-          mkdir -p ~/cache_test1
-          echo ${{ inputs.file1_content }} > ~/cache_test1/file1
-          echo ${{ inputs.file1_content }} > ~/cache_test1/file2
-          echo ${{ inputs.file2_content }} > ~/cache_test2
-      - uses: actions/cache@v3
-        id: cache2
-        with:
-          path: |
-            ~/cache_test3
-          key: cache2_test_${{ inputs.cache_name }}
-          restore-keys: |
-            cache2_test_
-      - name: write file
-        if: steps.cache2.outputs.cache-hit != 'true'
-        run: |
-          echo make file
-          echo ${{ inputs.file3_content }} > ~/cache_test3
-      - name: check files
-        run: |
-          cat ~/cache_test1/file1
-          cat ~/cache_test1/file2
-          cat ~/cache_test2
-          cat ~/cache_test3
+    - uses: actions/cache@v3
+      id: cache1
+      with:
+        path: |
+          ~/cache_test1
+          ~/cache_test11
+        key: cache_test_${{ inputs.cache1_number }}
+        restore-keys: |
+          cache_test_
+    - name: write file1
+      if: steps.cache1.outputs.cache-hit != 'true'
+      run: |
+        echo make file
+        mkdir -p ~/cache_test1
+        echo ${{ inputs.file1_content }} > ~/cache_test1/file1
+        echo ${{ inputs.file1_content }} > ~/cache_test1/file2
+        echo ${{ inputs.file1_content }} > ~/cache_test11
+    - uses: actions/cache@v3
+      id: cache2
+      with:
+        path: |
+          ~/cache_test2
+        key: cache2_test_${{ inputs.cache2_number }}
+    - name: write file2
+      if: steps.cache2.outputs.cache-hit != 'true'
+      run: |
+        echo make file
+        echo ${{ inputs.file2_content }} > ~/cache_test2
+    - name: restore
+      id: cache-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          ~/cache_test3
+        key: cache3_test_${{ inputs.cache3_number }}
+    - name: write file3
+      if: steps.cache3.outputs.cache-hit != 'true'
+      run: |
+        echo make file
+        echo ${{ inputs.file3_content }} > ~/cache_test3
+    - name: save
+      id: save
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          ~/cache_test3
+        key: cache3_test_${{ inputs.cache3_number }}
+    - name: check files
+      run: |
+        cat ~/cache_test1/file1
+        cat ~/cache_test1/file2
+        cat ~/cache_test11
+        cat ~/cache_test2
+        cat ~/cache_test3
