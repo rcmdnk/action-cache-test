@@ -67,7 +67,7 @@ jobs:
         echo make file
         echo ${{ inputs.file2_content }} > ~/cache_test2
     - name: restore
-      id: cache-restore
+      id: cache3
       uses: actions/cache/restore@v3
       with:
         path: |
