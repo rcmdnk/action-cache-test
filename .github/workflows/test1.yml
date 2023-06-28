@@ -80,6 +80,7 @@ jobs:
         echo ${{ inputs.file3_content }} > ~/cache_test3
     - name: save
       id: save
+      if: steps.cache3.outputs.cache-hit != 'true'
       uses: actions/cache/save@v3
       with:
         path: |
