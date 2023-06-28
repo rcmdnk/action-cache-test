@@ -41,4 +41,4 @@ jobs:
       - name: check files
         run: |
           cat ~/cache_test1/file1
-          cat ~/cache_test2/file1
+          cat ~/cache_test2/file2
