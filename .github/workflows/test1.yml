@@ -1,0 +1,44 @@
+name: test1
+on:
+  workflow_dispatch:
+    inputs:
+      cache_name:
+        description: 'cache name'
+        type: string
+        required: true
+        default: 'cache1'
+      file1_content:
+        description: 'content of file1'
+        type: string
+        required: true
+        default: 'this is file 1'
+      file2_content:
+        description: 'content of file2'
+        type: string
+        required: true
+        default: 'this is file 2'
+
+jobs:
+  cache_test:
+    name: cache_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ~/cache_test1
+            ~/cache_test2
+          key: cache_test_${{ inputs.cache_name }}
+      - name: write file
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          echo make file
+          mkdir -p ~/cache_test1
+          mkdir -p ~/cache_test2
+          echo ${{ inputs.file1_content }} > ~/cache_test1/file1
+          echo ${{ inputs.file2_content }} > ~/cache_test2/file2
+      - name: check files
+        run: |
+          cat ~/cache_test1/file1
+          cat ~/cache_test2/file1
